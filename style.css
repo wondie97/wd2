@@ -1,0 +1,309 @@
+/* ============================
+   WonDieWorld - Cozy Forest UI
+   ============================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 공통 바탕 – 파스텔 하늘 + 살짝 그라디언트 */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Noto Sans KR",
+    sans-serif;
+  background: radial-gradient(circle at top left, #c9f3ff, #bfe8ff 45%, #9cd6ff),
+              radial-gradient(circle at bottom right, #ffd9f1, #ffc8e6 45%, #a8e1ff);
+  background-blend-mode: screen;
+  color: #574034;
+}
+
+/* 모든 화면 공통 래퍼 */
+.screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+/* =========================
+   로그인 화면 (index.html)
+   ========================= */
+
+.screen-login {
+  position: relative;
+}
+
+/* 아랫쪽 잔디 언덕 느낌 */
+.screen-login::before {
+  content: "";
+  position: absolute;
+  inset: auto -60px 0 -60px;
+  height: 170px;
+  background:
+    radial-gradient(circle at 12% 0, #68c790 0, transparent 55%),
+    radial-gradient(circle at 34% 0, #54b27d 0, transparent 55%),
+    radial-gradient(circle at 66% 0, #57a7d8 0, transparent 55%),
+    radial-gradient(circle at 90% 0, #4f92c8 0, transparent 55%);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+/* 로그인 패널 – 코지 카드 */
+.panel {
+  position: relative;
+  z-index: 1;
+  width: 360px;
+  padding: 28px 26px 22px;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fffaf4, #fdf2df);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+/* 로고 / 버전 */
+.logo {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #574034;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.9);
+}
+
+.version {
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(255, 182, 222, 0.85);
+  color: #8a426c;
+}
+
+.subtitle {
+  margin: 6px 0 22px;
+  font-size: 13px;
+  color: #897160;
+}
+
+/* 라벨 / 인풋 / 버튼 */
+label {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: #8f7765;
+}
+
+input {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 14px;
+  border: 2px solid rgba(147, 120, 92, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  color: #574034;
+  outline: none;
+}
+
+input::placeholder {
+  color: rgba(140, 110, 90, 0.6);
+}
+
+input:focus {
+  border-color: #70b9ff;
+  box-shadow: 0 0 0 2px rgba(112, 185, 255, 0.3);
+}
+
+/* 기본 큰 버튼 (로그인 등) */
+button {
+  margin-top: 16px;
+  width: 100%;
+  padding: 9px 0;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #ff9ad6, #70b9ff);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+button:hover {
+  filter: brightness(1.05);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.hint {
+  margin-top: 16px;
+  font-size: 11px;
+  color: #8f7765;
+  line-height: 1.4;
+}
+
+/* =========================
+   우드 버튼 (공통)
+   – 네가 준 코드 기반으로 조금 다듬음
+   ========================= */
+
+.wood-btn {
+  position: relative;
+  border: none;
+  cursor: pointer;
+  background: #d99a4a;
+  border-radius: 18px;
+  box-shadow:
+    0 4px 0 #956533,
+    0 8px 16px rgba(0, 0, 0, 0.25);
+  padding: 0;
+  overflow: visible;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+}
+
+.wood-btn.big {
+  width: 180px;
+  height: 110px;
+}
+
+.wood-btn.small {
+  width: 110px;
+  height: 42px;
+}
+
+/* 나무판 그라디언트 */
+.wood-btn::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    #f4c073 0%,
+    #e39c4c 45%,
+    #d58a3a 80%,
+    #c97b2c 100%
+  );
+}
+
+/* 나무 결 */
+.wood-btn::after {
+  content: "";
+  position: absolute;
+  inset: 10%;
+  border-radius: 12px;
+  background-image: linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.06) 0,
+    transparent 30%,
+    rgba(0, 0, 0, 0.04) 60%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+/* 클릭/호버 */
+.wood-btn:hover {
+  filter: brightness(1.04);
+}
+
+.wood-btn:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #956533,
+    0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* 버튼 안쪽 실제 컨텐츠 영역 */
+.wood-btn-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 아이콘 박스 – 나중에 PNG로 바꿀 수 있게 */
+.wood-icon {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* 예시: 이모지로 대체 (PNG 나오면 background-image로 교체) */
+.wood-icon::before {
+  content: "";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 구체적인 예시 아이콘들 */
+.icon-house {
+  background-color: #68c3a3;
+}
+.icon-house::before {
+  content: "🏠";
+  font-size: 32px;
+}
+
+.icon-book {
+  background-color: #fbe1a7;
+}
+.icon-book::before {
+  content: "📘";
+  font-size: 30px;
+}
+
+.icon-mushroom {
+  background-color: #8fd9a6;
+}
+.icon-mushroom::before {
+  content: "🍄";
+  font-size: 30px;
+}
+
+.icon-camera {
+  background-color: #ffb4c8;
+}
+.icon-camera::before {
+  content: "📷";
+  font-size: 30px;
+}
+
+/* 버튼 라벨 텍스트 */
+.wood-label {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #4e321e;
+}
+
+/* =========================
+   플라자 화면에서 공통으로 쓸
+   폰트/텍스트 작은 유틸
+   ========================= */
+
+.text-soft {
+  font-size: 12px;
+  color: #8f7765;
+}

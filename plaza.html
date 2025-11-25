@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>WonDieWorld - Cozy Plaza</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== 플라자 전용 레이아웃 ===== */
+
+    body.screen-plaza {
+      overflow: hidden;
+      /* 기본 body 그라디언트 위에 비네팅 살짝 추가하고 싶으면 여기서 */
+    }
+
+    .plaza-root {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      padding: 18px 26px 22px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 20px;
+    }
+
+    /* 왼쪽 : 나무 테이블 + 책 + 게임 화면 + 하단 HUD */
+    .plaza-main {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    /* 나무 테이블 */
+    .wood-table {
+      flex: 1;
+      border-radius: 30px;
+      padding: 18px 22px;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          #c58a57 0,
+          #c58a57 42px,
+          #b67946 42px,
+          #b67946 44px
+        );
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.8),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 책 껍데기 */
+    .book-shell {
+      position: absolute;
+      inset: 12px 14px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #fdf2df, #f2d4aa);
+      box-shadow:
+        0 14px 30px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 1px rgba(131, 77, 35, 0.4);
+    }
+
+    .book-shell::before {
+      content: "";
+      position: absolute;
+      top: 10px;
+      bottom: 10px;
+      left: 50%;
+      width: 3px;
+      transform: translateX(-50%);
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.1),
+        rgba(255, 255, 255, 0.65),
+        rgba(0, 0, 0, 0.08)
+      );
+      opacity: 0.85;
+    }
+
+    .book-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      padding: 20px 26px;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .page-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-right {
+      width: 30%;
+      min-width: 260px;
+      height: 72%;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fffaf2, #f3e0c4);
+      box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.25),
+        inset 0 0 0 1px rgba(207, 171, 123, 0.45);
+      opacity: 0.45;
+    }
+
+    /* 게임 화면 프레임 */
+    .game-frame {
+      width: 100%;
+      max-width: 1180px;
+      aspect-ratio: 16 / 9;
+      border-radius: 24px;
+      background: radial-gradient(circle at top, #84c5ff, #1e2a46 80%);
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.85),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+    }
+
+    #gameCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      background: transparent;
+    }
+
+    /* 하단 HUD : 초상화 + 스탯 + 나가기 */
+    .plaza-hud {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+
+    /* 초상화 박스 */
+    .hud-portrait {
+      min-width: 160px;
+      padding: 12px 10px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fff7eb, #f1dcbf);
+      box-shadow:
+        0 9px 20px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .portrait-frame {
+      width: 96px;
+      height: 96px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fffaf5, #f3e1c6);
+      box-shadow:
+        0 6px 12px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 3px rgba(212, 164, 103, 0.9);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #portraitImg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      image-rendering: pixelated;
+    }
+
+    .portrait-placeholder {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7a5230;
+      opacity: 0.85;
+    }
+
+    .portrait-label {
+      position: absolute;
+      bottom: 4px;
+      left: 0;
+      right: 0;
+      font-size: 11px;
+      text-align: center;
+      color: #8f7765;
+    }
+
+    /* 스탯 패널 */
+    .hud-status {
+      padding: 12px 18px 10px;
+      border-radius: 22px;
+      background: linear-gradient(145deg, #fffaf4, #f3dec5);
+      box-shadow:
+        0 9px 20px rgba(0, 0, 0, 0.55),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .status-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-nick {
+      font-weight: 800;
+      color: #7a5230;
+      letter-spacing: 0.03em;
+    }
+
+    .status-meta {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: #7a5230;
+    }
+
+    .status-meta span {
+      display: inline-flex;
+      gap: 4px;
+      align-items: baseline;
+    }
+
+    .status-meta label {
+      font-size: 11px;
+      opacity: 0.7;
+    }
+
+    #hudHp,
+    #hudLv,
+    #hudExp {
+      font-weight: 700;
+    }
+
+    .status-bars {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px 18px;
+      font-size: 12px;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-label {
+      display: flex;
+      justify-content: space-between;
+      color: #7a5230;
+      opacity: 0.9;
+    }
+
+    .stat-bar {
+      width: 100%;
+      height: 11px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+      position: relative;
+    }
+
+    .stat-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      border-radius: inherit;
+      transition: width 0.12s ease-out;
+    }
+
+    .stat-fill.hp {
+      background: linear-gradient(90deg, #ff8a9b, #f75454);
+    }
+
+    .stat-fill.mp {
+      background: linear-gradient(90deg, #7ac4ff, #3f8cef);
+    }
+
+    .stat-fill.exp {
+      background: linear-gradient(90deg, #ffd47a, #ffb347);
+    }
+
+    /* 나가기 버튼 – 우드 버튼 small 사용 */
+    .hud-exit {
+      align-self: stretch;
+    }
+
+    .hud-exit .wood-label {
+      margin-top: 0;
+      font-size: 14px;
+      color: #fffaf2;
+    }
+
+    /* 오른쪽 사이드 바 : 우드 버튼 메뉴 */
+    .plaza-side {
+      width: 190px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .coin-panel {
+      padding: 11px 12px;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #fff7eb, #f4ddbe);
+      box-shadow:
+        0 8px 18px rgba(0, 0, 0, 0.45),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .coin-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #7a5230;
+    }
+
+    .coin-value {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .coin-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fff5cc, #f2c94c);
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(154, 99, 30, 0.8);
+    }
+
+    .coin-amount {
+      color: #5b381b;
+    }
+
+    @media (max-width: 1120px) {
+      .plaza-root {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto;
+        row-gap: 14px;
+      }
+
+      .page-right {
+        display: none;
+      }
+
+      .plaza-side {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+
+<body class="screen screen-plaza">
+  <div class="plaza-root">
+    <!-- 중앙: 나무 테이블 + 책 + 게임 화면 + HUD -->
+    <div class="plaza-main">
+      <div class="wood-table">
+        <div class="book-shell"></div>
+
+        <div class="book-inner">
+          <div class="page-left">
+            <div class="game-frame">
+              <canvas id="gameCanvas" width="960" height="540"></canvas>
+            </div>
+          </div>
+          <div class="page-right"></div>
+        </div>
+      </div>
+
+      <!-- 하단 HUD -->
+      <div class="plaza-hud">
+        <!-- 초상화 -->
+        <div class="hud-portrait">
+          <div class="portrait-frame">
+            <img id="portraitImg" alt="캐릭터 초상화" />
+            <div class="portrait-placeholder" style="display:none;">초상화</div>
+          </div>
+          <div class="portrait-label">캐릭터 초상화</div>
+        </div>
+
+        <!-- 스탯 -->
+        <div class="hud-status">
+          <div class="status-top">
+            <div id="hudNickname" class="status-nick">닉네임: ???</div>
+            <div class="status-meta">
+              <span><label>LV</label><span id="hudLv">1</span></span>
+              <span><label>HP</label><span id="hudHp">5 / 5</span></span>
+              <span><label>EXP</label><span id="hudExp">0 / 10</span></span>
+            </div>
+          </div>
+
+          <div class="status-bars">
+            <div class="stat-row">
+              <div class="stat-label"><span>HP</span></div>
+              <div class="stat-bar"><div class="stat-fill hp"></div></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label"><span>MP</span></div>
+              <div class="stat-bar"><div class="stat-fill mp"></div></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label"><span>EXP</span></div>
+              <div class="stat-bar"><div class="stat-fill exp"></div></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label"><span>여유 슬롯</span></div>
+              <div class="stat-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 나가기 버튼 = 우드 버튼 small -->
+        <button id="btnBack" class="wood-btn small hud-exit">
+          <div class="wood-btn-content">
+            <span class="wood-label">나가기</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- 오른쪽: 우드 메뉴 버튼 -->
+    <aside class="plaza-side">
+      <div class="coin-panel">
+        <div class="coin-label">코인</div>
+        <div class="coin-value">
+          <div class="coin-icon"></div>
+          <span class="coin-amount">0</span>
+        </div>
+      </div>
+
+      <!-- 상점 -->
+      <button class="wood-btn big" data-target="shop">
+        <div class="wood-btn-content">
+          <span class="wood-icon icon-house"></span>
+          <span class="wood-label">상점</span>
+        </div>
+      </button>
+
+      <!-- 미니게임 -->
+      <button class="wood-btn big" data-target="minigame">
+        <div class="wood-btn-content">
+          <span class="wood-icon icon-mushroom"></span>
+          <span class="wood-label">미니게임</span>
+        </div>
+      </button>
+
+      <!-- 창고 -->
+      <button class="wood-btn big" data-target="storage">
+        <div class="wood-btn-content">
+          <span class="wood-icon icon-camera"></span>
+          <span class="wood-label">창고</span>
+        </div>
+      </button>
+
+      <!-- 도감 -->
+      <button class="wood-btn big" data-target="dex">
+        <div class="wood-btn-content">
+          <span class="wood-icon icon-book"></span>
+          <span class="wood-label">도감</span>
+        </div>
+      </button>
+    </aside>
+  </div>
+
+  <!-- 기존 게임 엔진 -->
+  <script src="js/sprite.js"></script>
+  <script src="js/main.js"></script>
+
+  <script>
+    // ===== 초상화 로딩 (localStorage에 저장된 avatar key 기준) =====
+    const portraitImg = document.getElementById("portraitImg");
+    const portraitPlaceholder = document.querySelector(".portrait-placeholder");
+
+    const avatarKey = localStorage.getItem("wondie_avatar_key") || "default";
+    const AVATAR_PORTRAITS = {
+      default: "img/portraits/default.png",
+      hero_1: "img/portraits/hero_1.png",
+      hero_2: "img/portraits/hero_2.png",
+      rabbit: "img/portraits/rabbit.png",
+    };
+
+    const portraitSrc = AVATAR_PORTRAITS[avatarKey] || AVATAR_PORTRAITS.default;
+
+    if (portraitSrc) {
+      portraitImg.src = portraitSrc;
+      portraitImg.onload = () => {
+        if (portraitPlaceholder) portraitPlaceholder.style.display = "none";
+      };
+      portraitImg.onerror = () => {
+        portraitImg.style.display = "none";
+        if (portraitPlaceholder) portraitPlaceholder.style.display = "block";
+      };
+    } else {
+      portraitImg.style.display = "none";
+      if (portraitPlaceholder) portraitPlaceholder.style.display = "block";
+    }
+
+    // ===== 우드 메뉴 버튼 클릭 – 나중에 각 씬으로 연결용 자리 =====
+    document.querySelectorAll(".plaza-side .wood-btn[data-target]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.target;
+        console.log("go to:", target);
+        // TODO: shop.html / minigame.html / storage.html / dex.html 로 이동
+      });
+    });
+  </script>
+</body>
+</html>

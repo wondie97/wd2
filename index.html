@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>WonDieWorld 0.5a-side - 로그인</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="screen screen-login">
+  <div class="panel">
+    <h1 class="logo">WonDieWorld <span class="version">v0.5a-side</span></h1>
+    <p class="subtitle">닉네임을 정하고 사이드뷰 마을로 입장하세요.</p>
+
+    <form id="loginForm">
+      <label for="nickname">닉네임</label>
+      <input id="nickname" name="nickname" maxlength="12" autocomplete="off" required />
+      <button type="submit">마을 입장</button>
+    </form>
+
+    <p class="hint">
+      ※ 0.5a-side 버전은 <strong>전투 + 레벨 + 데미지 표시 + 몹 사망 연출</strong> 전용입니다.<br />
+      실제 데미지/몬스터 시스템은 이후 버전에서 붙입니다.
+    </p>
+  </div>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const nicknameInput = document.getElementById("nickname");
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = nicknameInput.value.trim();
+      if (!name) return;
+      localStorage.setItem("wondie_nickname", name);
+      window.location.href = "plaza.html";
+    });
+
+    const lastName = localStorage.getItem("wondie_nickname");
+    if (lastName) nicknameInput.value = lastName;
+  </script>
+</body>
+</html>
